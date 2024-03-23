@@ -1,0 +1,3 @@
+[submodule "repository/geoapify-nest-adapter"]
+	path = repository/geoapify-nest-adapter
+	url = git@github.com:AlexeyVorobyev/geoapify-nest-adapter.git

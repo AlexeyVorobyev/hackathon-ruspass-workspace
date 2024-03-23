@@ -1,0 +1,41 @@
+version: "1.0"
+name: "hackathon-ruspass-microservices"
+services:
+  geoapify-nest-adapter:
+    container_name: geoapify-nest-adapter-ruspass
+    build:
+      context: repository/geoapify-nest-adapter
+    hostname: geoapify-nest-adapter-ruspass
+    env_file:
+      - path: repository/geoapify-nest-adapter/env/.env.prod
+        required: true
+    ports:
+      - ${GEOAPIFY_NEST_ADAPTER_EXTERNAL_PORT}:8081
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${GEOAPIFY_NEST_ADAPTER_ADDRESS}
+
+  nginx-reverse-proxy:
+    container_name: nginx-reverse-proxy-ruspass
+    build:
+      context: nginx
+      no_cache: true
+    hostname: nginx-reverse-proxy-ruspass
+    depends_on:
+      - geoapify-nest-adapter
+    environment:
+      GEOAPIFY_NEST_ADAPTER_ADDRESS: ${GEOAPIFY_NEST_ADAPTER_ADDRESS}
+    ports:
+      - ${NGINX_REVERSE_PROXY_EXTERNAL_PORT}:80
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${NGINX_REVERSE_PROXY_ADDRESS}
+
+networks:
+  dev-network-ruspass:
+    driver: bridge
+    external: true
+    ipam:
+      config:
+        - subnet: ${COMPOSE_SUBNET}
+          gateway: ${COMPOSE_GATEWAY}
