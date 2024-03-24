@@ -15,6 +15,20 @@ services:
       dev-network-ruspass:
         ipv4_address: ${GEOAPIFY_NEST_ADAPTER_ADDRESS}
 
+  search-image-nest-adapter:
+    container_name: search-image-nest-adapter-ruspass
+    build:
+      context: repository/search-image-nest-adapter
+    hostname: search-image-nest-adapter-ruspass
+    env_file:
+      - path: repository/search-image-nest-adapter/env/.env.prod
+        required: true
+    ports:
+      - ${SEARCH_IMAGE_NEST_ADAPTER_EXTERNAL_PORT}:8081
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${SEARCH_IMAGE_NEST_ADAPTER_ADDRESS}
+
   nginx-reverse-proxy:
     container_name: nginx-reverse-proxy-ruspass
     build:
