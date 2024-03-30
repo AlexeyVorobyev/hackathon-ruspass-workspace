@@ -4,3 +4,6 @@
 [submodule "repository/search-image-nest-adapter"]
 	path = repository/search-image-nest-adapter
 	url = git@github.com:AlexeyVorobyev/search-image-nest-adapter.git
+[submodule "repository/ruspass-nextjs-frontend"]
+	path = repository/ruspass-nextjs-frontend
+	url = https://github.com/AlexeyVorobyev/ruspass-nextjs-frontend

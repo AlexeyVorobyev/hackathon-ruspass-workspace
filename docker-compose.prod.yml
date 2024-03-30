@@ -29,6 +29,20 @@ services:
       dev-network-ruspass:
         ipv4_address: ${SEARCH_IMAGE_NEST_ADAPTER_ADDRESS}
 
+  ruspass-nextjs-frontend:
+    container_name: ruspass-nextjs-frontend
+    hostname: ruspass-nextjs-frontend
+    build:
+      context: repository/ruspass-nextjs-frontend
+    ports:
+      - ${RUSPASS_NEXTJS_FRONTEND_EXTERNAL_PORT}:3000
+    env_file:
+      - path: repository/ruspass-nextjs-frontend/.env
+        required: true
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${RUSPASS_NEXTJS_FRONTEND_ADDRESS}
+
   nginx-reverse-proxy:
     container_name: nginx-reverse-proxy-ruspass
     build:
