@@ -39,6 +39,9 @@ services:
     env_file:
       - path: repository/ruspass-nextjs-frontend/.env
         required: true
+    depends_on:
+     - geoapify-nest-adapter
+     - search-image-nest-adapter
     networks:
       dev-network-ruspass:
         ipv4_address: ${RUSPASS_NEXTJS_FRONTEND_ADDRESS}
@@ -51,6 +54,8 @@ services:
     hostname: nginx-reverse-proxy-ruspass
     depends_on:
       - geoapify-nest-adapter
+      - search-image-nest-adapter
+      - ruspass-nextjs-frontend
     environment:
       GEOAPIFY_NEST_ADAPTER_ADDRESS: ${GEOAPIFY_NEST_ADAPTER_ADDRESS}
     ports:
