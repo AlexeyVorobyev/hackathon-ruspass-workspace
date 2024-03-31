@@ -7,3 +7,6 @@
 [submodule "repository/ruspass-nextjs-frontend"]
 	path = repository/ruspass-nextjs-frontend
 	url = git@github.com:AlexeyVorobyev/ruspass-nextjs-frontend.git
+[submodule "repository/ruspass-nest-service"]
+	path = repository/ruspass-nest-service
+	url = git@github.com:AlexeyVorobyev/ruspass-nest-service.git

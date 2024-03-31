@@ -29,6 +29,47 @@ services:
       dev-network-ruspass:
         ipv4_address: ${SEARCH_IMAGE_NEST_ADAPTER_ADDRESS}
 
+  postgres-ruspass:
+    build:
+      dockerfile_inline: |
+        FROM library/postgres:15.2-alpine
+        COPY ./config/postgres/create-multiple-postgresql-databases.sh /docker-entrypoint-initdb.d/
+    container_name: postgres-ruspass
+    hostname: postgres-ruspass
+    restart: unless-stopped
+    ports:
+      - ${POSTGRES_RUSPASS_EXTERNAL_PORT}:5432
+    environment:
+      # сработает только если нет волюма
+      POSTGRES_MULTIPLE_DATABASES: ruspass
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data:cached
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${POSTGRES_RUSPASS_ADDRESS}
+
+  postgres-ruspass-admin-panel:
+    container_name: postgres-ruspass-admin-panel
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    hostname: postgres-ruspass-admin-panel
+    depends_on:
+      - postgres-ruspass
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - ${POSTGRES_RUSPASS_ADMIN_PANEL_EXTERNAL_PORT}:80
+    volumes:
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json # preconfigured servers/connections
+      - ./config/pgadmin/.pgpass:/.pgpass # passwords for the connections in this file
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${POSTGRES_RUSPASS_ADMIN_PANEL_ADDRESS}
+
   ruspass-nextjs-frontend:
     container_name: ruspass-nextjs-frontend
     hostname: ruspass-nextjs-frontend
@@ -46,16 +87,35 @@ services:
       dev-network-ruspass:
         ipv4_address: ${RUSPASS_NEXTJS_FRONTEND_ADDRESS}
 
+  ruspass-nest-service:
+    container_name: ruspass-nest-service
+    build:
+      context: repository/ruspass-nest-service
+    hostname: ruspass-nest-service
+    env_file:
+      - path: repository/ruspass-nest-service/env/.env.prod
+        required: true
+    ports:
+      - ${RUSPASS_NEST_SERVICE_EXTERNAL_PORT}:8081
+    depends_on:
+     - postgres-ruspass
+    networks:
+      dev-network-ruspass:
+        ipv4_address: ${RUSPASS_NEST_SERVICE_ADDRESS}
+
   nginx-reverse-proxy:
     container_name: nginx-reverse-proxy-ruspass
     build:
-      context: nginx
+      context: config/nginx
       no_cache: true
     hostname: nginx-reverse-proxy-ruspass
     depends_on:
       - geoapify-nest-adapter
       - search-image-nest-adapter
       - ruspass-nextjs-frontend
+      - postgres-ruspass
+      - postgres-ruspass-admin-panel
+      - ruspass-nest-service
     environment:
       GEOAPIFY_NEST_ADAPTER_ADDRESS: ${GEOAPIFY_NEST_ADAPTER_ADDRESS}
     ports:
